@@ -1,0 +1,25 @@
+name: Pipeline de Integración Continua(CI)
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches:  ["main", "master"]
+jobs:
+  testes-e-validacao:
+    runs-on: ubuntu-latest
+  steps:
+      - name: Baixar o código-fonte
+        uses: actions/checkout@v4
+      - name: Configurar Node.js
+        uses: docker/setup-node@v4
+        with:
+          node-version: '20'
+          cache: "npm"
+      - name: Instalar dependências
+        run: npm ci
+      - name: Executar Linter
+        run: npm run lint
+      - name: Executar Testes Automatizados
+        run: npm test
+      - name: Verificação de Segurança de Dependências (SAST)
+        run: npm audit --audit-level=high

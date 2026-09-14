@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  postgres-db:
+    image: postgres:18-alpine
+    container_name: meu-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:  
+      # AJUSTADO: Removido o '/data' do final e mudado o nome para 'pgdata_novo'
+      - pgdata_novo:/var/lib/postgresql
+    networks:
+      - rede-interna
+  app:
+    build: .
+    container_name: minha-aplicacao-web
+    restart: always
+    ports:
+      - "${APP_PORT}:3000"
+    environment:
+      DB_HOST: postgres-db
+      DB_USER: ${POSTGRES_USER}
+      DB_PASS: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
+    depends_on:
+      - postgres-db
+    networks:
+      - rede-interna
+volumes:
+  # AJUSTADO: Nome alterado para garantir um banco limpo e sem erros
+  pgdata_novo:
+networks:
+  rede-interna:
+    driver: bridge

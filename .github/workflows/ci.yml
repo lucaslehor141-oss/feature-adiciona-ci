@@ -1,17 +1,17 @@
 name: Pipeline de Integración Continua(CI)
 on:
   push:
-    branches: ["main", "master"]
+    branches: ["main", "master", "feature/adiciona-ci"] # Adicionei sua branch aqui para o teste rodar direto no push
   pull_request:
     branches:  ["main", "master"]
 jobs:
   testes-e-validacao:
     runs-on: ubuntu-latest
-  steps:
+    steps: # Agora os steps estão bem abaixo do job correspondente
       - name: Baixar o código-fonte
         uses: actions/checkout@v4
       - name: Configurar Node.js
-        uses: docker/setup-node@v4
+        uses: actions/setup-node@v4 # Corrigido de docker/setup-node para actions/setup-node
         with:
           node-version: '20'
           cache: "npm"

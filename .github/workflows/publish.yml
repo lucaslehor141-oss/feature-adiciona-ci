@@ -1,0 +1,36 @@
+name: Build e Publicação de imagem Docker
+on:
+  push:
+    branches: ["main"] # dispara apenas ao realizar merge ou push na main
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o código-fonte
+        uses: actions/checkout@v4
+# step 2: configurar o Docker Buildx
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v3
+# step 3: autenticar no DockerHub usando secrets
+      - name: Autenticar no DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+# step 4: extrair metadados para versionamento inteligente
+      - name: Extrair metadados do docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKER_USERNAME }}/minha-aplicacao
+          tags: |
+            type=raw,value=latest
+            type=sha,format=short
+# step 5: construir e publicar (build and push)
+      - name: Construir e Publicar imagem
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
